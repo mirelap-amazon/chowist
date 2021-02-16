@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import logging
 import logging.config
 import os
+from codeguru_profiler_agent import Profiler
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 CUR_PATH = os.path.abspath(__file__)
@@ -169,6 +170,12 @@ LOGGING = {
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": True,
         },
+        "codeguru_profiler_agent": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            # Setting this to False because to avoid duplication of logs from Profiler(..).start()
+            "propagate": False,
+        },
     },
 }
 
@@ -176,6 +183,8 @@ logging.config.dictConfig(LOGGING)
 logger = logging.getLogger(__name__)
 logger.info("Custom settings for logging were set.")
 
+# Start CodeGuru Profiler; the log configuration for codeguru_profiler_agent is set in the LOGGING.
+Profiler(profiling_group_name="ChowistPG").start()
 
 # Crispy forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html
