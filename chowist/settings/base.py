@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import logging
+import logging.config
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -119,6 +121,8 @@ LOGIN_REDIRECT_URL = "portal:home"
 
 # Logging
 # https://docs.djangoproject.com/en/3.1/topics/logging/
+# https://www.caktusgroup.com/blog/2015/01/27/Django-Logging-Configuration-logging_config-default-settings-logger/
+LOGGING_CONFIG = None
 
 LOGGING = {
     "version": 1,
@@ -129,14 +133,9 @@ LOGGING = {
         },
         "simple": {"format": "%(levelname)s %(message)s"},
     },
-    "filters": {
-        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
-        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
-    },
     "handlers": {
         "console": {
             "level": "DEBUG",
-            "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
@@ -149,11 +148,10 @@ LOGGING = {
             "utc": True,
             "formatter": "verbose",
         },
-        "mail_admins": {
-            "level": "ERROR",
-            "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler",
-        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
     },
     "loggers": {
         "django": {
@@ -162,17 +160,21 @@ LOGGING = {
             "propagate": True,
         },
         "places": {
-            "handlers": ["console", "mail_admins"],
+            "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": True,
         },
         "portal": {
-            "handlers": ["console", "mail_admins"],
+            "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": True,
         },
     },
 }
+
+logging.config.dictConfig(LOGGING)
+logger = logging.getLogger(__name__)
+logger.info("Custom settings for logging were set.")
 
 
 # Crispy forms
