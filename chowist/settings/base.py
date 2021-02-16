@@ -184,7 +184,7 @@ logger = logging.getLogger(__name__)
 logger.info("Custom settings for logging were set.")
 
 # Start CodeGuru Profiler; the log configuration for codeguru_profiler_agent is set in the LOGGING.
-Profiler(profiling_group_name="ChowistPG").start()
+Profiler(profiling_group_name="PythonDemoDjangoApplication").start()
 
 # Crispy forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html

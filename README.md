@@ -1,62 +1,32 @@
 # Chowist
 
-[![CircleCI](https://img.shields.io/circleci/build/github/huangsam/chowist)](https://circleci.com/gh/huangsam/chowist)
-[![License](https://img.shields.io/github/license/huangsam/chowist)](https://github.com/huangsam/chowist/blob/master/LICENSE)
+This repository includes a fork of the [the huangsam/chowist repository](https://github.com/huangsam/chowist). The original versions of the files are MIT licensed.
 
-Great places are chosen by great chowists.
+This fork shows how to run a Django + uWSGI application with [Amazon CodeGuru Profiler Python Agent](https://github.com/aws/amazon-codeguru-profiler-python-agent).
 
-This is an application that replicates core features of [Yelp](https://www.yelp.com/), and adds a couple more bells and whistles.
+1. Make sure you have installed the latest version of [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html). Use an IAM entity for the AWS CLI that has permissions to access CodeGuru Profiler to create all the required components for the demo application to run.
+    ```
+    aws configure # Set up your AWS credentials and region as usual.
+    ```
 
-Here are some key features:
+2. Create a profiling group in CodeGuru Profiler, named PythonDemoDjangoApplication.
+    ```
+    aws codeguruprofiler create-profiling-group --profiling-group-name PythonDemoDjangoApplication
+    ```
 
-- Homepage for marketing purposes
-- Profile for customized experience
-- Places as list and detail views
-
-[Click here](https://youtu.be/SqVBcunjFHQ) to see a quick walkthrough of the application.
-
-## Getting started
-
-Here are some things to be aware of in development and production.
-
-### Local setup
-
-Install dependencies and create a `virtualenv` instance:
-
-    virtualenv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-
-Then run database migration:
-
+3. Run the database migration:
+    ```
     python manage.py migrate
+    ```
 
-Finally, start up the Django development server:
+4. Start the server with uswgi.
+    ```
+    uwsgi --http :8000 --chdir . --wsgi-file chowist/wsgi.py --enable-threads --lazy-apps
+    ```
 
-    python manage.py runserver
+5. Generate some traffic.
+    ```
+    .demo/curl-requests.sh
+    ```
 
-### Local data
-
-For local development, you can load some data:
-
-    python manage.py loaddemo .demo/places.json
-
-Here are the loaded users for reference:
-
-- `admin` with password `admin` (Super user)
-- `john` with password `john` (Normal user)
-- `jane` with password `jane` (Normal user)
-
-### Docker setup
-
-Complete local setup with Docker by running a single command:
-
-    docker-compose -f compose/dev.yml -p chowist up --build -d
-
-### Production setup
-
-For production, you will want to use `gunicorn` for running the server:
-
-    gunicorn -w 4 chowist.wsgi
-
-When using Gunicorn, remember to host the static files from a web server.
+6. Go to the [AWS CodeGuru Profiler console](https://console.aws.amazon.com/codeguru/profiler) to check the results. Choose the region you picked and your profiling group.
